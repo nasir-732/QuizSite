@@ -1,0 +1,15 @@
+<h2>Update Your Profile</h2>
+<form method="post" action="{% url 'Quiz:updateprofile' user.id %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="bio">Bio</label>
+    <textarea name="bio" id="bio" cols="10" rows="3">{{ user_profile.bio }}</textarea><br>
+    <label for="image">Profile Photo</label>
+    <input type="file" name="image" id="image"><br>
+    
+    <!-- Display the current profile photo -->
+    {% if user_profile.image %}
+        <img src="{{ user_profile.image.url }}" alt="Profile Photo" style="max-width: 200px;">
+    {% endif %}
+    
+    <button type="submit">Update Profile</button>
+</form>

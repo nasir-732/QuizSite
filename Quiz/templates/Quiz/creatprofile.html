@@ -1,0 +1,11 @@
+<h2>Creat profile</h2>
+<form method="post" action="{% url 'Quiz:creatprofile' user.id %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="bio">Bio</label>
+    <textarea name="bio" id="bio" cols="10" rows="1"></textarea><br>
+    <label for="image">Profile Photo</label>
+    <input type="file" name="image" id="image"><br>
+    <button type="submit">Creat Profile</button>
+
+
+</form>

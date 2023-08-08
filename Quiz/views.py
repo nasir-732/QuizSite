@@ -1,6 +1,7 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponse
 from django.contrib.auth.models import User 
+from .models import Userprofile 
 from django.urls import reverse
 from django.contrib.auth import authenticate,login,logout
 
@@ -37,6 +38,7 @@ def signupPage(request):
 
            my_user=User.objects.create_user(uname,email,pass1)
            my_user.save()
+           print("my,user",my_user)
            return redirect("Quiz:login")
     
 
@@ -45,3 +47,52 @@ def signupPage(request):
 def logoutpage(request):
     logout(request)
     return redirect('Quiz:login')
+
+def creatprofilePage(request , id):
+    user = request.user
+    if request.method =='POST':
+        bio=request.POST.get('bio')
+        image=request.FILES.get('image') if 'image' in request.FILES else None
+        print(image)
+        user_profile = Userprofile.objects.create(
+            user=request.user,
+            bio=bio,
+            image=image
+        ) 
+        user_profile.save()
+        return redirect('Quiz:profile',id)
+        # return redirect("Quiz:profile")
+
+    return render(request,'Quiz/creatprofile.html')
+
+def profilePage(request, id):
+    # user = request.user
+    user = get_object_or_404(User, pk = id)
+    # print(user)
+    # return HttpResponse("profile")
+    user_profie=Userprofile.objects.filter(user=user.id)
+    # print(user_profie)
+    
+    return render(request,'Quiz/profile.html',{'profile':user_profie})
+# 
+
+def updateprofilePage(request, id):
+    user = get_object_or_404(User, pk=id)
+    user_profile, created = Userprofile.objects.get_or_create(user=user)
+
+    context = {
+        'user': user,
+        'user_profile': user_profile,
+    }
+
+    if request.method == 'POST':
+        new_bio = request.POST.get('bio')
+        new_image=request.FILES.get('image') if 'image' in request.FILES else None
+        user_profile.bio = new_bio
+        user_profile.image = new_image
+        
+        user_profile.save()
+
+        return redirect('Quiz:profile', id=id)
+
+    return render(request, 'Quiz/updateprofile.html', context)

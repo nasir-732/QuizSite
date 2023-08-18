@@ -11,7 +11,7 @@ urlpatterns = [
     path('creatprofile/<int:id>', views.creatprofilePage , name='creatprofile'),
     path('profile/<int:id>', views.profilePage , name='profile'),
     path('updateprofile/<int:id>', views.updateprofilePage , name='updateprofile'),
-
+    path('api/get-quiz/', views.get_quiz, name='get_quiz'),
 ]
 
 

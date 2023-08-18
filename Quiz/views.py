@@ -1,9 +1,10 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse , JsonResponse
 from django.contrib.auth.models import User 
-from .models import Userprofile 
+from .models import *
 from django.urls import reverse
 from django.contrib.auth import authenticate,login,logout
+import random
 
 # Create your views here.
 
@@ -96,3 +97,27 @@ def updateprofilePage(request, id):
         return redirect('Quiz:profile', id=id)
 
     return render(request, 'Quiz/updateprofile.html', context)
+
+def get_quiz(request):
+    try:
+        question_objs = list(Question.objects.all())
+        data=[]
+        random.shuffle((question_objs))
+
+        print(question_objs)
+        for question_obj in question_objs:
+            data.append({
+                "Category":question_obj.Category.category_name,
+                "question":question_obj.question,
+                "marks":question_obj.marks,
+                "answers":question_obj.get_answers()
+            })
+        payload={'status' : True , 'data' : data}
+
+        return JsonResponse(payload)
+      
+
+
+    except Exception as e:
+        print(e) 
+    return HttpResponse("something went wrong")       

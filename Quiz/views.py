@@ -6,12 +6,22 @@ from django.urls import reverse
 from django.contrib.auth import authenticate,login,logout
 import random
 
+
 # Create your views here.
 
 def HomePage(request):
-    user = request.user
-    print(user.id)
-    return render(request,'Quiz/home.html')
+    context = {'categories' : Category.objects.all()}
+
+    # if request.GET.get('category'):
+    #     return redirect(f"Quiz/quiz/?category={request.GET.get('category')}")
+    return render (request , 'Quiz/home.html', context)
+
+def Quiz(request):
+    context = {'category'  : request.GET.get('category')}
+    return render(request, "Quiz/quiz.html" , context)
+    # user = request.user
+    # print(user.id)
+    # return render(request,'Quiz/home.html')
 
 def loginPage(request):
     if request.method=='POST':
@@ -100,24 +110,56 @@ def updateprofilePage(request, id):
 
 def get_quiz(request):
     try:
-        question_objs = list(Question.objects.all())
+        question_objs =Question.objects.all()
+
+        if request.POST.get('quiz_category'):
+            question_objs= question_objs.filter(category__category_name__icontains=request.POST.get('quiz_category'))
+        question_objs= list(question_objs)    
         data=[]
         random.shuffle((question_objs))
 
         print(question_objs)
         for question_obj in question_objs:
             data.append({
-                "Category":question_obj.Category.category_name,
+                "uid":question_obj.uid,
+                "Category":question_obj.category.category_name,
                 "question":question_obj.question,
                 "marks":question_obj.marks,
                 "answers":question_obj.get_answers()
             })
-        payload={'status' : True , 'data' : data}
+        payload={'status' : True , 'questions' : data, 'questions_list': ','.join([str(i.pk) for i in question_objs])}
 
-        return JsonResponse(payload)
+        
+        return render(request, "Quiz/quiz.html" , payload)
+
+        # return JsonResponse(payload)
       
 
 
     except Exception as e:
         print(e) 
-    return HttpResponse("something went wrong")       
+    return HttpResponse("something went wrong")  
+
+def result(request):
+        # results=Result.objects.all()
+        given_questions = request.POST.get('questions_list').split(',')
+        # actual_questions_from_database = Question.objects.filter(pk__in=given_questions)
+
+        result = 0
+
+        for q in given_questions:
+            user_selected_choice_for_q = request.POST.get(q)
+            correct_answer = Answer.objects.get(question__uid=q, is_correct=True)
+
+            if user_selected_choice_for_q == correct_answer.answer:
+                result += 1
+
+        print(result)
+        
+        return render(request, 'Quiz/result.html' ,{'results': result})
+
+def quiz_view(request):
+    if request.method == 'POST':
+        # Handle quiz submission here
+        # ...
+        return render(request, "Quiz/quiz.html")

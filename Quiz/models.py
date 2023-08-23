@@ -24,7 +24,7 @@ class Category(BaseModel):
         return self.category_name
 
 class Question(BaseModel):
-    Category = models.ForeignKey(Category , related_name='category' ,on_delete=models.CASCADE)
+    category = models.ForeignKey(Category , related_name='category' ,on_delete=models.CASCADE)
     question = models.CharField(max_length=100)
     marks = models.IntegerField(default=5)
 
@@ -49,5 +49,11 @@ class Answer(BaseModel):
 
      def __str__(self) -> str:
         return self.answer
+class Quiz(models.Model):
+    question = models.CharField(max_length=255)
+    answers = models.ManyToManyField(Answer)
 
+class Result(models.Model):
+    question= models.ForeignKey(Question, related_name='result', on_delete=models.CASCADE)
+    useranswer= models.CharField(max_length=200)
 

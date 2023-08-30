@@ -141,22 +141,20 @@ def get_quiz(request):
     return HttpResponse("something went wrong")  
 
 def result(request):
-        # results=Result.objects.all()
-        given_questions = request.POST.get('questions_list').split(',')
-        # actual_questions_from_database = Question.objects.filter(pk__in=given_questions)
+    given_questions = request.POST.getlist('questions_list')
+    result = 0
 
-        result = 0
+    for q in given_questions:
+        user_selected_choice_for_q = request.POST.get(q)
+        correct_answer = Answer.objects.get(question__uid=q, is_correct=True)
 
-        for q in given_questions:
-            user_selected_choice_for_q = request.POST.get(q)
-            correct_answer = Answer.objects.get(question__uid=q, is_correct=True)
+        if user_selected_choice_for_q == correct_answer.answer:
+            result += 1
 
-            if user_selected_choice_for_q == correct_answer.answer:
-                result += 1
+    print(result)
+    
+    return render(request, 'Quiz/result.html', {'results': result})
 
-        print(result)
-        
-        return render(request, 'Quiz/result.html' ,{'results': result})
 
 def quiz_view(request):
     if request.method == 'POST':

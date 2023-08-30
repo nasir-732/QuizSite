@@ -95,34 +95,47 @@
       </form>
     </div>
   </div>
+  <<!DOCTYPE html>
+<html>
+<head>
+  <title>Countdown Timer</title>
+</head>
+<body>
+  <div id="countdown">Loading...</div>
+
   <script>
-    // Set the countdown duration in seconds
-    var countdownDuration = 600; // 10 minutes
-    
+    var countdownDuration = 5; // in seconds
+    var resultPageURL = "/result/"; // Replace with your result page URL
+
     function updateCountdown() {
       var countdownElement = document.getElementById("countdown");
       var currentTime = new Date().getTime();
       var endTime = currentTime + countdownDuration * 1000;
-      
+
       var x = setInterval(function() {
         var now = new Date().getTime();
         var distance = endTime - now;
-        
+
         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        
+
         countdownElement.innerHTML = minutes + "m " + seconds + "s ";
-        
+
         if (distance < 0) {
           clearInterval(x);
           countdownElement.innerHTML = "Time's up!";
-          // You can add code here to submit the quiz automatically
+          // Redirect to the result page
+          window.location.href = resultPageURL;
         }
       }, 1000);
     }
-    
+
+    // Call the function to start the countdown
     updateCountdown();
   </script>
+</body>
+</html>
+
 </body>
 </html>
 
